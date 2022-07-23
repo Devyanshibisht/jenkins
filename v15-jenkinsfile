@@ -6,7 +6,7 @@ pipeline {
 	stages {
 	    stage('Git CheckOut') {
 		    steps {
-			   checkout([$class: 'GitSCM', branches: [[name:'*/main']], userRemoteConfigs: [[url: 'https://github.com/Devyanshibisht/Profile-card']]])
+			  checkout([$class: 'GitSCM', branches: [[name: '*/dragon']], extensions: [], userRemoteConfigs: [[url: 'https://github.com/Devyanshibisht/rock-paper-scissors']]])
 			}
 		}
         stage('Clean and Install') {
