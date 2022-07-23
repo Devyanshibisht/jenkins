@@ -1,0 +1,62 @@
+pipeline {
+    agent any
+    tools {
+        maven "3.8.6"
+    }
+    stages {
+        stage("Git CheckOut") {
+            steps {
+                git branch: 'main', credentialsId: 'f4cb7c60-3ec3-4ed1-a403-1141a60da3f9', url: 'https://github.com/Devyanshibisht/webappforjenkins.git'
+            }
+        }
+        stage('Clean and Install') {
+            steps {
+               bat 'mvn clean install'
+            }
+        }
+        stage('Package') {
+            steps {
+               bat 'mvn package'
+            }
+        }
+		stage ('Package'){
+		    steps {
+			    bat 'mvn package'
+			}
+		}
+		stage ('Server'){
+		    steps {
+			   rtServer (
+			    id: "Artifactory",
+				url: 'https://localhost:8082/artifactory',
+				username: 'devyanshi'
+				password: 'devyanshi',
+				 bypassProxy: true,
+                   timeout: 300
+                        )
+            }
+        }
+        stage('Upload'){
+            steps{
+                rtUpload (
+                 serverId:"Artifactory" ,
+                  spec: '''{
+                   "files": [
+                      {
+                      "pattern": "*.war",
+                      "target": "logic-ops-lab-libs-snapshot-local"
+                      }
+                            ]
+                           }''',
+                        )
+            }
+        }
+        stage ('Publish build info') {
+            steps {
+                rtPublishBuildInfo (
+                    serverId: "Artifactory"
+                )
+            }
+        }
+    }
+}
